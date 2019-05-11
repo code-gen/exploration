@@ -1,0 +1,5 @@
+nltk
+mittens==0.1
+tqdm
+numpy
+scikit_learn
