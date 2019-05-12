@@ -1,5 +1,10 @@
 # Data exploration
 
+### Embeddings fine-tuning
+
+Fine-tuned embedding matrix has shape `len(vocab) x vector_dim` and must be mixed with the original embeddings,
+for each word in the vocabulary.
+
 ### Downloads
 
 - [Embeddings](https://drive.google.com/open?id=1eWmnnDRWhv3YQYN5s3pecWqVCkj1btTK)

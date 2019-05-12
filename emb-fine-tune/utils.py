@@ -40,7 +40,7 @@ def load_pt_glove(emb_file: str) -> dict:
     return glove_emb
 
 
-def load_ft_glove(vocab_file, pt_emb_file, ft_emb_file):
+def load_ft_glove(vocab_file, pt_emb_file, ft_emb_file, ft_factor=0.5, pt_factor=0.5):
     print(" * load vocab from [%s]" % vocab_file)
     print(" * load pre-trained glove from [%s]" % pt_emb_file)
     print(" * load fine-tuned glove from [%s]" % ft_emb_file)
@@ -52,10 +52,10 @@ def load_ft_glove(vocab_file, pt_emb_file, ft_emb_file):
 
     ft_glove_emb = {w: ft_glove_emb_arr[i] for w, i in vocab.items()}
 
-    for w in tqdm(ft_glove_emb, desc="Mixing embeddings"):
+    for w in tqdm(ft_glove_emb, desc="Mixing embeddings (ft %.2f, pt %.2f)" % (ft_factor, pt_factor)):
         if w not in glove_emb:
             glove_emb[w] = ft_glove_emb[w]
         else:
-            glove_emb[w] = 0.5 * ft_glove_emb[w] + 0.5 * glove_emb[w]
+            glove_emb[w] = ft_factor * ft_glove_emb[w] + pt_factor * glove_emb[w]
 
     return glove_emb

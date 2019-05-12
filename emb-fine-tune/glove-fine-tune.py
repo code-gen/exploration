@@ -15,6 +15,7 @@ import os
 import pickle
 import re
 from collections import Counter
+import glob
 
 import numpy as np
 from mittens.tf_mittens import Mittens
@@ -101,24 +102,21 @@ def tf_idf(data_source: str, vocab_size: int, min_df=0.1, max_df=1.0):
 
 
 def get_all_words(data_source: str):
-    # source: path to a directory containg files, or to a file containing paths
+    """source: path to a directory containg files, or to a file containing paths"""
 
     all_words = []
 
     if os.path.isdir(data_source):
-        listing = os.listdir(data_source)
-        path_of = lambda x: os.path.join(data_source, x)
+        listing = sorted(glob.glob('%s/**/*.txt' % data_source, recursive=True))
     else:  # regular file
         listing = [l.strip() for l in open(data_source).readlines()]
-        path_of = lambda x: x
 
-    for l in tqdm(listing, desc="Get all words"):
-        file_contents = [clean_text(l.strip().lower()) for l in open(path_of(l), "rt").readlines()]
+    word_predicate = lambda w: re.match(r'[\w]+', w) and w not in stopWords
 
-        for line in file_contents:
-            for w in line.split():
-                if re.match(r'[\w]+', w) and w not in stopWords:
-                    all_words.append(w)
+    for file in tqdm(listing, desc="Get all words"):
+        # TODO: use something smarter (spacy / nltk)
+        lines = [clean_text(l.strip().lower()) for l in open(file, "rt").readlines()]
+        all_words += [w for line in lines for w in line.split() if word_predicate(w)]
 
     return all_words
 
@@ -144,10 +142,12 @@ def create_vocab_and_cooccurrence_matrix(data_source, vocab_size=20000, window_s
     print("len(all_words) = %d" % len(all_words))
 
     top_words, _ = zip(*create_vocab_counter(all_words).most_common()[:vocab_size])
-    top_words = set(top_words)
 
     word2idx = {w: i for i, w in enumerate(top_words)}
+
     co_occur_mat = np.zeros((vocab_size, vocab_size), dtype=np.uint16)
+
+    top_words = set(top_words)
 
     for i in tqdm(range(len(all_words)), desc='Constructing co-occurrence matrix'):
         if all_words[i] not in top_words: continue
