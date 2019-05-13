@@ -29,7 +29,7 @@ stopWords = set(stopwords.words('english'))
 
 arg_parser = argparse.ArgumentParser()
 
-arg_parser.add_argument("-root_dir", type=str, default="./data-out", help="Root directory used to store files")
+arg_parser.add_argument("-root_dir", type=str, default="../embeddings", help="Root directory used to store files")
 arg_parser.add_argument("-data_source", type=str, help="Path to dir with files OR file listing")
 arg_parser.add_argument("-name", type=str, help="Name for data source (e.g. pydoc)")
 arg_parser.add_argument("-num_ft_iter", type=int, default=1000, help="Number of fine-tuning iterations")
@@ -39,17 +39,20 @@ arg_parser.add_argument("-window_size", type=int, default=5)
 
 args = arg_parser.parse_args()
 
+OUT_DIR = os.path.join(args.root_dir, "%s-glove-fine-tuned-vocab-%d-window-%d-iter-%d" % (
+    args.name, args.vocab_size, args.window_size, args.num_ft_iter
+))
 VOCAB_FILE = os.path.join(
-    args.root_dir, '%s-vocab-%d-window-%d.vocab' % (args.name, args.vocab_size, args.window_size)
+    OUT_DIR, '%s-vocab-%d-window-%d.vocab' % (args.name, args.vocab_size, args.window_size)
 )
 CO_OCCURR_MAT_FILE = os.path.join(
-    args.root_dir, '%s-vocab-%d-window-%d.mat' % (args.name, args.vocab_size, args.window_size)
+    OUT_DIR, '%s-vocab-%d-window-%d.mat' % (args.name, args.vocab_size, args.window_size)
 )
-FT_EMB_FILE = os.path.join(
-    args.root_dir, "%s-glove-fine-tuned-vocab-%d-window-%d-iter-%d" % (
-        args.name, args.vocab_size, args.window_size, args.num_ft_iter
-    )
-)
+FT_EMB_FILE = os.path.join(OUT_DIR, "%s-glove-fine-tuned-vocab-%d-window-%d-iter-%d.emb" % (
+    args.name, args.vocab_size, args.window_size, args.num_ft_iter
+))
+
+os.makedirs(OUT_DIR, exist_ok=True)
 
 
 def do_fine_tune() -> None:

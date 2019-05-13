@@ -1,5 +1,6 @@
-nltk
-mittens==0.1
+gensim
 tqdm
 numpy
+mittens
+nltk
 scikit_learn
