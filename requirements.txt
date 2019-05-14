@@ -1,6 +1,8 @@
 gensim
 tqdm
+nltk
 numpy
 mittens
-nltk
+pandas
+astpretty
 scikit_learn
