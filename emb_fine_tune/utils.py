@@ -56,7 +56,7 @@ def get_all_words(data_source: str, emb: dict = None) -> list:
     return all_words
 
 
-def get_all_words_python_so(pickle_file: str, min_thr=1, emb: dict = None) -> list:
+def get_all_words_python_so(pickle_file: str, min_freq=1, emb: dict = None) -> list:
     all_words = []
     counter = Counter()
     question_words = pickle.load(open(pickle_file, 'rb'))
@@ -72,7 +72,7 @@ def get_all_words_python_so(pickle_file: str, min_thr=1, emb: dict = None) -> li
                 counter[word] += 1
                 all_words.append(word)
 
-    return [word for word in all_words if counter[word] >= min_thr]
+    return [word for word in all_words if counter[word] >= min_freq]
 
 
 def create_vocab_counter(words):
