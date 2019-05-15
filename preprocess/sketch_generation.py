@@ -27,16 +27,29 @@ from tokenize import tokenize
 import io
 import builtins
 from collections import defaultdict
+from termcolor import colored
 
 
-class ASTVisitor(ast.NodeTransformer):
+class ASTVisitor(ast.NodeVisitor):
     def __init__(self):
         self.functions = {}  # map function name -> num args
 
-    def visit_Call(self, node: ast.Name):
-        self.functions[node.func.id] = len(node.args)
+        self.name_by_type = {
+            ast.Attribute: lambda x: x.attr,
+            ast.Name     : lambda x: x.id,
+            ast.Subscript: lambda x: x.slice.value.id,
+        }
 
-        return ast.copy_location(node, node)
+    def visit_Call(self, node: ast.Call):
+        if isinstance(node.func, ast.Call):
+            self.visit_Call(node.func)
+        else:
+            func_name = self.name_by_type[type(node.func)](node.func)
+
+            for arg in node.args:
+                self.generic_visit(arg)
+
+            self.functions[func_name] = len(node.args)
 
 
 class SketchVocab:
@@ -53,7 +66,7 @@ class SketchVocab:
 
 class Sketch:
 
-    def __init__(self, code_snippet: str):
+    def __init__(self, code_snippet: str, verbose=False):
         self.code_snippet = code_snippet
 
         self.names = defaultdict(lambda: [])
@@ -64,11 +77,18 @@ class Sketch:
         self.ordered = []
 
         # namedtuple: type string start end line
+        if verbose:
+            print(colored(" * tokenizing [%s]" % code_snippet, 'yellow'))
         self.tok_list = list(tokenize(io.BytesIO(self.code_snippet.encode('utf-8')).readline))
 
         # AST
         self.ast_visitor = ASTVisitor()
-        self.ast = self.ast_visitor.visit(ast.parse(self.code_snippet))
+        self.ast = None
+        try:
+            self.ast = self.ast_visitor.visit(ast.parse(self.code_snippet))
+        except SyntaxError:
+            if verbose:
+                print(colored(" * skipping ast generation for [%s]" % code_snippet, 'red'))
 
     def generate(self):
         """
@@ -104,7 +124,7 @@ class Sketch:
                 self.ordered.append(tok.string)
 
             else:
-                assert tok_type in ['ENCODING', 'NEWLINE', 'ENDMARKER']
+                assert tok_type in ['ENCODING', 'NEWLINE', 'ENDMARKER', 'ERRORTOKEN'], "%s" % tok_type
 
         return self
 
@@ -116,11 +136,17 @@ class Sketch:
             str(list(self.operators.keys()))
         )
 
+    def split(self, delim=' '):
+        return str(self).split(delim)
+
     def __str__(self):
-        return " ".join(self.ordered)
+        return ' '.join(self.ordered)
 
     def __repr__(self):
         return str(self)
+
+    def __len__(self):
+        return len(self.ordered)
 
     @staticmethod
     def is_reserved_keyword(name):
@@ -141,8 +167,10 @@ def main():
     # astpretty.pprint(tree.body[0], indent=' ' * 4)
     # exec(compile(tree, filename="<ast>", mode="exec"))
 
-    code_snippet = "result = [x for x in DoWork(xs) if x % 2 == 0]"
-    sketch = Sketch(code_snippet).generate()
+    code_snippet = "return getattr(instance, name)()"
+    astpretty.pprint(ast.parse(code_snippet).body[0], indent=' ' * 4)
+
+    sketch = Sketch(code_snippet, verbose=True).generate()
 
     # print(sketch.details())
     print(sketch)
