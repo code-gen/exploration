@@ -23,7 +23,7 @@ import ast
 import astpretty
 
 import token
-from tokenize import tokenize
+from tokenize import tokenize, TokenInfo
 import io
 import builtins
 from collections import defaultdict
@@ -76,7 +76,6 @@ class Sketch:
 
         self.ordered = []
 
-        # namedtuple: type string start end line
         if verbose:
             print(colored(" * tokenizing [%s]" % code_snippet, 'yellow'))
         self.tok_list = list(tokenize(io.BytesIO(self.code_snippet.encode('utf-8')).readline))
@@ -90,6 +89,17 @@ class Sketch:
             if verbose:
                 print(colored(" * skipping ast generation for [%s]" % code_snippet, 'red'))
 
+    def refine_name(self, tok: TokenInfo):
+        if self.is_reserved_keyword(tok.string):
+            self.keywords[tok.string].append(tok.start[1])
+            self.ordered.append(tok.string)
+        else:
+            self.names[tok.string].append(tok.start[1])
+            if tok.string in self.ast_visitor.functions:
+                self.ordered.append(SketchVocab.FUNC_ID + "#%d" % self.ast_visitor.functions[tok.string])
+            else:
+                self.ordered.append(SketchVocab.NAME_ID)
+
     def generate(self):
         """
         TODO:
@@ -100,16 +110,7 @@ class Sketch:
             tok_type = token.tok_name[tok.type]
 
             if tok_type == 'NAME':
-                # TODO: can be augmented with info about what 'NAME' is
-                if self.is_reserved_keyword(tok.string):
-                    self.keywords[tok.string].append(tok.start[1])
-                    self.ordered.append(tok.string)
-                else:
-                    self.names[tok.string].append(tok.start[1])
-                    if tok.string in self.ast_visitor.functions:
-                        self.ordered.append(SketchVocab.FUNC_ID + "#%d" % self.ast_visitor.functions[tok.string])
-                    else:
-                        self.ordered.append(SketchVocab.NAME_ID)
+                self.refine_name(tok)
 
             elif tok_type == 'STRING':
                 self.literals[tok.string].append(tok.start[1])
@@ -155,7 +156,7 @@ class Sketch:
             "else", "except", "exec", "finally", "for", "from", "global", "if",
             "import", "in", "is", "lambda", "not", "or", "pass", "print", "raise",
             "return", "try", "while", "yield", "None", "self"
-        ])
+        ])  # len = 182
 
         return name in RESERVED_KEYWORDS
 
