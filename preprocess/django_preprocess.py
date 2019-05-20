@@ -11,7 +11,7 @@ from typing import List, Tuple
 
 from tqdm.auto import tqdm
 
-from common import clean_text, print_skipped, replace_strings, write_to_file
+from common import clean_text, print_skipped, replace_strings, split_accessor, write_to_file
 from sketch_generation import Sketch
 
 arg_parser = argparse.ArgumentParser()
@@ -44,7 +44,7 @@ def preprocess(data: List[Tuple[str, str]], verbose=False) -> Tuple[List[dict], 
             continue
 
         code_tokens = code.split()
-        label = [clean_text(x) for x in anno.split()]
+        label = split_accessor([clean_text(x) for x in anno.split()])
 
         if len(sketch) != len(code_tokens):
             sketch = str(sketch).split()

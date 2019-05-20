@@ -1,6 +1,7 @@
 import json
 import re
 from typing import Any, List
+import itertools
 
 PUNCTUATION = {
     'keep'  : "&,.",
@@ -26,10 +27,31 @@ def replace_strings(data):
     regex = re.compile(r'(\"{3}(?:[^\"\\]|\\.)*\"{3})|(\'{3}(?:[^\'\\]|\\.)*\'{3})|(\"(?:[^\"\\]|\\.)*\")|(\'(?:[^\'\\]|\\.)*\')')
 
     for i, x in enumerate(regex.findall(data)):
-        r = [a for a in x if len(a) > 0][0]
+        m = [a for a in x if len(a)]
+        assert len(m) == 1
+        r = m[0]
         data = data.replace(r, '"_STR:%d_"' % i)
 
     return data
+
+
+def intersperse(x, xs):
+    return list(itertools.chain.from_iterable(zip(xs, [x] * len(xs))))[:-1]
+
+
+def split_accessor(data):
+    if not isinstance(data, list):
+        data = data.split()
+
+    out = []
+    regex = re.compile(r'([^\s\.]+)(\.[^\s\.]+)+')
+
+    for x in data:
+        out += [x]
+        if regex.match(x):
+            out += ['['] + intersperse(".", x.split(".")) + [']']
+
+    return out
 
 
 def write_to_file(filename: str, data: List[dict]) -> None:
@@ -39,6 +61,10 @@ def write_to_file(filename: str, data: List[dict]) -> None:
 
 
 def print_skipped(name: str, skipped: List[Any]) -> None:
+    if not skipped:
+        print(" * no skipped examples for %s" % name)
+        return
+
     print(" * skipped examples for %s" % name)
 
     if isinstance(skipped[0], tuple):

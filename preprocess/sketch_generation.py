@@ -57,11 +57,11 @@ class SketchVocab:
     FUNC_ID = "FUNC"
     STR_LITERAL_ID = "STRING"
     NUM_LITERAL_ID = "NUMBER"
-    RESERVED_ID = "<reserved>"
-    ACCESSOR_ID = "<accessor>"
-    ASSIGN_ID = "<assign>"
-    ARITHMETIC_ID = "<arithmetic>"
-    OP_ID = "<op>"
+    # RESERVED_ID = "<reserved>"
+    # ACCESSOR_ID = "<accessor>"
+    # ASSIGN_ID = "<assign>"
+    # ARITHMETIC_ID = "<arithmetic>"
+    # OP_ID = "<op>"
 
 
 class Sketch:
