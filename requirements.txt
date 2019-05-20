@@ -1,9 +1,0 @@
-gensim
-tqdm
-nltk
-numpy
-mittens
-pandas
-astpretty
-scikit_learn
-termcolor
