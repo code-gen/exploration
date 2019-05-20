@@ -34,8 +34,8 @@ def preprocess(data: List[Tuple[str, str]], verbose=False) -> Tuple[List[dict], 
     out_data = []
 
     for raw_code, raw_anno in tqdm(data, desc='Processing'):
-        code = replace_strings(raw_code)
-        anno = replace_strings(raw_anno)
+        code = replace_strings(raw_code, fmt='"_STR:%d_"')
+        anno = replace_strings(raw_anno, fmt='_STR:%d_')
 
         try:
             sketch = Sketch(code, verbose).generate()
@@ -43,8 +43,16 @@ def preprocess(data: List[Tuple[str, str]], verbose=False) -> Tuple[List[dict], 
             skipped.append((raw_code, raw_anno))
             continue
 
-        code_tokens = code.split()
         label = split_accessor([clean_text(x) for x in anno.split()])
+
+        # TODO - hackish
+        code_tokens = []
+        for tok in code.split():
+            if tok[0] == tok[-1] == '"':
+                code_tokens.append('%s %s %s' % (tok[0], tok[1:-1], tok[-1]))
+            else:
+                code_tokens.append(tok)
+        # TODO ---
 
         if len(sketch) != len(code_tokens):
             sketch = str(sketch).split()

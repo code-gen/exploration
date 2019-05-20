@@ -23,14 +23,14 @@ def clean_text(x):
     return x
 
 
-def replace_strings(data):
+def replace_strings(data, fmt):
     regex = re.compile(r'(\"{3}(?:[^\"\\]|\\.)*\"{3})|(\'{3}(?:[^\'\\]|\\.)*\'{3})|(\"(?:[^\"\\]|\\.)*\")|(\'(?:[^\'\\]|\\.)*\')')
 
     for i, x in enumerate(regex.findall(data)):
         m = [a for a in x if len(a)]
         assert len(m) == 1
         r = m[0]
-        data = data.replace(r, '"_STR:%d_"' % i)
+        data = data.replace(r, fmt % i)
 
     return data
 
