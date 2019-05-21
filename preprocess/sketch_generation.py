@@ -47,9 +47,14 @@ class ASTVisitor(ast.NodeVisitor):
             func_name = self.name_by_type[type(node.func)](node.func)
 
             for arg in node.args:
-                self.generic_visit(arg)
+                if isinstance(arg, ast.Call):
+                    self.visit_Call(arg)
+                else:
+                    self.generic_visit(arg)
 
             self.functions[func_name] = len(node.args)
+            if hasattr(node, 'keywords'):
+                self.functions[func_name] += len(node.keywords)
 
 
 class SketchVocab:
@@ -168,7 +173,7 @@ def main():
     # astpretty.pprint(tree.body[0], indent=' ' * 4)
     # exec(compile(tree, filename="<ast>", mode="exec"))
 
-    code_snippet = "return getattr(instance, name)()"
+    code_snippet = "abc.xyz(ghi.jkl(x, y, z), y.aa())"
     astpretty.pprint(ast.parse(code_snippet).body[0], indent=' ' * 4)
 
     sketch = Sketch(code_snippet, verbose=True).generate()
