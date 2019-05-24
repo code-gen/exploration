@@ -106,11 +106,6 @@ class Sketch:
                 self.ordered.append(SketchVocab.NAME_ID)
 
     def generate(self):
-        """
-        TODO:
-        - separate support for slices?
-        """
-
         for tok in self.tok_list:
             tok_type = token.tok_name[tok.type]
 

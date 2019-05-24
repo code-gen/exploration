@@ -7,5 +7,6 @@ python emb_fine_tune/test_fine_tune.py \
     -pt_emb_file ${base_dir}/glove.6B.200d.txt \
     -vocab_file ${base_dir}/${exp_name}/*.vocab \
     -ft_emb_file ${base_dir}/${exp_name}/*.emb \
-    -pt_factor 0.0 \
-    -ft_factor 1.0
+    -pt_factor 0.05 \
+    -ft_factor 0.95 \
+    -n 10
