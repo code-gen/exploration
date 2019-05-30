@@ -9,30 +9,53 @@ PUNCTUATION = {
 }
 
 
-def clean_text(x):
-    # x = x.lower()
+def clean_text(x, lower=False):
+    if lower:
+        x = x.lower()
 
     for p in PUNCTUATION['keep']:
         x = x.replace(p, "%s" % p)
     for p in PUNCTUATION['remove']:
         x = x.replace(p, '')
 
-    if x[-1] in ['.', ',']:
+    if x != '' and x[-1] in ['.', ',']:
         x = x[:-1]
 
     return x
 
 
-def replace_strings(data, fmt):
-    regex = re.compile(r'(\"{3}(?:[^\"\\]|\\.)*\"{3})|(\'{3}(?:[^\'\\]|\\.)*\'{3})|(\"(?:[^\"\\]|\\.)*\")|(\'(?:[^\'\\]|\\.)*\')')
+def unquote(s: str, once=False) -> str:
+    qs = ['`', '\'', '"']
+
+    if all([s[0] == s[-1], s[0] in qs, s[-1] in qs]):
+        return s[1:-1] if once else unquote(s[1:-1])
+    else:
+        return s
+
+
+def replace_strings(data, fmt, return_replaced_dict=False):
+    regex = re.compile(
+        r'(\"{3}(?:[^\"\\]|\\.)*\"{3})|'
+        r'(\'{3}(?:[^\'\\]|\\.)*\'{3})|'
+        r'(\`{3}(?:[^\`\\]|\\.)*\`{3})|'
+        r'(\"(?:[^\"\\]|\\.)*\")|'
+        r'(\'(?:[^\'\\]|\\.)*\')|'
+        r'(\`(?:[^\`\\]|\\.)*\`)'
+    )
+
+    rpl = {}
 
     for i, x in enumerate(regex.findall(data)):
         m = [a for a in x if len(a)]
         assert len(m) == 1
         r = m[0]
         data = data.replace(r, fmt % i)
+        rpl[fmt % i] = r
 
-    return data
+    if return_replaced_dict:
+        return data, rpl
+    else:
+        return data
 
 
 def intersperse(x, xs):

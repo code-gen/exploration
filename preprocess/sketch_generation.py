@@ -20,13 +20,14 @@ NAME = [ NAME for NAME in FUNC#1 ( NAME ) if NAME % NUMBER == NUMBER ]
 """
 
 import ast
-import astpretty
-
-import token
-from tokenize import tokenize, TokenInfo
-import io
 import builtins
+import io
+import sys
+import token
 from collections import defaultdict
+from tokenize import TokenInfo, tokenize
+
+import astpretty
 from termcolor import colored
 
 
@@ -34,27 +35,35 @@ class ASTVisitor(ast.NodeVisitor):
     def __init__(self):
         self.functions = {}  # map function name -> num args
 
-        self.name_by_type = {
-            ast.Attribute: lambda x: x.attr,
-            ast.Name     : lambda x: x.id,
-            ast.Subscript: lambda x: x.slice.value.id,
-        }
+    @staticmethod
+    def name_by_type(node):
+        if isinstance(node, ast.Attribute):
+            return node.attr
+        if isinstance(node, ast.Name):
+            return node.id
+        if isinstance(node, ast.Subscript):
+            try:
+                return node.slice.value.id
+            except AttributeError:
+                return node.slice.value
+
+        return None
 
     def visit_Call(self, node: ast.Call):
         if isinstance(node.func, ast.Call):
             self.visit_Call(node.func)
         else:
-            func_name = self.name_by_type[type(node.func)](node.func)
+            func_name = self.name_by_type(node.func)
+
+            self.functions[func_name] = len(node.args)
+            if hasattr(node, 'keywords'):
+                self.functions[func_name] += len(node.keywords)
 
             for arg in node.args:
                 if isinstance(arg, ast.Call):
                     self.visit_Call(arg)
                 else:
                     self.generic_visit(arg)
-
-            self.functions[func_name] = len(node.args)
-            if hasattr(node, 'keywords'):
-                self.functions[func_name] += len(node.keywords)
 
 
 class SketchVocab:
@@ -98,6 +107,7 @@ class Sketch:
         if self.is_reserved_keyword(tok.string):
             self.keywords[tok.string].append(tok.start[1])
             self.ordered.append(tok.string)
+
         else:
             self.names[tok.string].append(tok.start[1])
             if tok.string in self.ast_visitor.functions:
@@ -168,7 +178,7 @@ def main():
     # astpretty.pprint(tree.body[0], indent=' ' * 4)
     # exec(compile(tree, filename="<ast>", mode="exec"))
 
-    code_snippet = "abc.xyz(ghi.jkl(x, y, z), y.aa())"
+    code_snippet = sys.argv[1]
     astpretty.pprint(ast.parse(code_snippet).body[0], indent=' ' * 4)
 
     sketch = Sketch(code_snippet, verbose=True).generate()
