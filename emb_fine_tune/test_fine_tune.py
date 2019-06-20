@@ -5,6 +5,7 @@ Check the quality of fine-tuned embeddings.
 import argparse
 from pprint import pprint
 
+import matplotlib.pyplot as plt
 import numpy as np
 from tqdm.auto import tqdm
 
@@ -18,6 +19,7 @@ arg_parser.add_argument("-ft_emb_file", type=str, help="Fine-tuned embeddings fi
 arg_parser.add_argument("-ft_factor", type=float, default=0.5, help="How much to account for the fine-tuned vector")
 arg_parser.add_argument("-pt_factor", type=float, default=0.5, help="How much to account for the pre-trained vector")
 arg_parser.add_argument("-n", type=int, default=5, help="Number of words to show")
+arg_parser.add_argument("-plot", action="store_true", help="Whether to plot the top-n sim scores side-by-side")
 
 args = arg_parser.parse_args()
 
@@ -44,11 +46,27 @@ def try_closest(name, emb, word, n=20):
     print()
 
 
-def try_closest_both(pt, ft, word, n=20):
+def try_closest_both(pt, ft, word, n=20, plot=False):
     try:
         cpt = closest_to(pt, word, n)
         cft = closest_to(ft, word, n)
         pprint(["pt: %20s (%.5f)    ft: %20s (%.5f)" % (p, ps, f, fs) for ((p, ps), (f, fs)) in zip(cpt, cft)])
+
+        if plot:
+            plt.suptitle(word)
+            plt.subplot(1, 2, 1)
+            plt.bar(range(n), [x[1] for x in cpt])
+            plt.xticks(range(n), [x[0] for x in cpt], rotation=45)
+            plt.title('pre-trained')
+            plt.tight_layout()
+
+            plt.subplot(1, 2, 2)
+            plt.bar(range(n), [x[1] for x in cft])
+            plt.xticks(range(n), [x[0] for x in cft], rotation=45)
+            plt.title('fine-tuned')
+            plt.tight_layout()
+
+            plt.show()
     except KeyError:
         print("%s not in emb" % word)
     print()
@@ -63,7 +81,7 @@ def main():
 
     while True:
         word = input("> enter word: ").strip()
-        try_closest_both(pt_emb, ft_emb, word, n=args.n)
+        try_closest_both(pt_emb, ft_emb, word, n=args.n, plot=args.plot)
 
 
 if __name__ == '__main__':

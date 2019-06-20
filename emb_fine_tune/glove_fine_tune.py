@@ -20,13 +20,13 @@ from utils import create_vocab_counter, dump_cfg, get_all_words, get_all_words_p
 arg_parser = argparse.ArgumentParser()
 
 arg_parser.add_argument("-root_dir", type=str, default="../embeddings", help="Root directory used to store files")
-arg_parser.add_argument("-data_source", type=str, help="Path to dir with files OR file listing")
+arg_parser.add_argument("-data_source", type=str, help="Path to dir with files OR file listing (for corpus)")
 arg_parser.add_argument("-exp_name", type=str, help="Name for current experiment")
 arg_parser.add_argument("-pt_emb_file", type=str, help="Pre-trained embeddings file")
 
 # fine-tune settings
 arg_parser.add_argument("-num_ft_iter", type=int, default=1000, help="Number of fine-tuning iterations")
-arg_parser.add_argument("-vocab_size", type=int, default=20000, help="Number of words to consider (at most!)")
+arg_parser.add_argument("-vocab_size", type=int, default=20000, help="Number of unique words to consider (at most!)")
 arg_parser.add_argument("-window_size", type=int, default=5)
 arg_parser.add_argument("-only_in_emb", action="store_true", help="If true, only use words that already exist in the pre-trained embeddings")
 arg_parser.add_argument("-min_freq", type=int, default=1, help="Consider words with frequency >= min_freq")
