@@ -2,6 +2,8 @@
 
 DIR=$1
 
+## DATASETS
+
 get_conala () {
     aria2c http://www.phontron.com/download/conala-corpus-v1.1.zip -d ./ --continue=true
     unzip ./conala-corpus-v1.1.zip
@@ -22,8 +24,8 @@ get_django () {
 }
 
 
-pushd . && mkdir -p $DIR && cd $DIR
+pushd . && mkdir -p ${DIR} && cd ${DIR}
 
-for d in "${@:2}"; do echo "Getting $d" && get_$d && echo; done
+for d in "${@:2}"; do echo "Getting $d" && get_${d} && echo; done
 
 popd
