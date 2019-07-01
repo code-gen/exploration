@@ -1,10 +1,1 @@
-## Notebook viewer
-- [django.ipynb](https://nbviewer.jupyter.org/github/code-gen/data-exploration/blob/master/notebooks/django.ipynb)
-- [mine\_docstrings.ipynb](https://nbviewer.jupyter.org/github/code-gen/data-exploration/blob/master/notebooks/mine_docstrings.ipynb)
-- [naps.ipynb](https://nbviewer.jupyter.org/github/code-gen/data-exploration/blob/master/notebooks/naps.ipynb)
-- [code\_equivalence.ipynb](https://nbviewer.jupyter.org/github/code-gen/data-exploration/blob/master/notebooks/code_equivalence.ipynb)
-- [misc.ipynb](https://nbviewer.jupyter.org/github/code-gen/data-exploration/blob/master/notebooks/misc.ipynb)
-- [staqc.ipynb](https://nbviewer.jupyter.org/github/code-gen/data-exploration/blob/master/notebooks/staqc.ipynb)
-- [utils\_nb.ipynb](https://nbviewer.jupyter.org/github/code-gen/data-exploration/blob/master/notebooks/utils_nb.ipynb)
-- [conala.ipynb](https://nbviewer.jupyter.org/github/code-gen/data-exploration/blob/master/notebooks/conala.ipynb)
-- [python\_stackoverflow.ipynb](https://nbviewer.jupyter.org/github/code-gen/data-exploration/blob/master/notebooks/python_stackoverflow.ipynb)
+[**Notebook Viewer**](https://nbviewer.jupyter.org/github/code-gen/data-exploration/tree/master/notebooks/)
