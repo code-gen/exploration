@@ -13,9 +13,9 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument(
     "-data_model_dir", type=str, default=os.path.join(os.path.abspath(os.path.dirname(__file__)), '../data_model')
 )
-arg_parser.add_argument("-vocab_file", type=str)  # e.g. comp-sci-corpus-thr20000-window10.vocab
-arg_parser.add_argument("-emb_file", type=str)  # e.g. glove.840B.300d.txt
-arg_parser.add_argument("-ft_emb_file", type=str)  # e.g. glove-fine-tuned-tfidf-2000
+arg_parser.add_argument("-vocab_file", type=str)  # .vocab
+arg_parser.add_argument("-emb_file", type=str)    # e.g. glove.840B.300d.txt
+arg_parser.add_argument("-ft_emb_file", type=str) # e.g. glove-fine-tuned-tfidf-2000
 
 args = arg_parser.parse_args()
 
