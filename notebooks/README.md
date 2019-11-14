@@ -1,1 +1,1 @@
-[**Notebook Viewer**](https://nbviewer.jupyter.org/github/code-gen/data-exploration/tree/master/notebooks/)
+[**Notebook Viewer**](https://nbviewer.jupyter.org/github/code-gen/exploration/tree/master/notebooks/)
