@@ -15,10 +15,11 @@ from common import clean_text, print_skipped, replace_strings, split_accessor, w
 from sketch_generation import Sketch
 
 arg_parser = argparse.ArgumentParser()
-arg_parser.add_argument('-in_dir', type=str, required=True)
-arg_parser.add_argument('-out_dir', type=str, required=True)
+arg_parser.add_argument('-in_dir', type=str, required=True, help='root directory for raw django data')
+arg_parser.add_argument('-out_dir', type=str, required=True, help='root directory to place processed data')
 arg_parser.add_argument('-dev_split', type=float, default=0.05)
 arg_parser.add_argument('-test_split', type=float, default=0.1)
+arg_parser.add_argument('-shuffle', action='store_true')
 args = arg_parser.parse_args()
 
 CODE_FILE = os.path.join(args.in_dir, 'all.code')
@@ -83,7 +84,9 @@ if __name__ == '__main__':
     anno_lines = [l.strip() for l in open(ANNO_FILE, "rt").readlines()]
 
     all_data = list(zip(code_lines, anno_lines))
-    random.shuffle(all_data)
+    
+    if args.shuffle:
+        random.shuffle(all_data)
 
     ds = int(args.dev_split * len(all_data))
     ts = int(args.test_split * len(all_data))
